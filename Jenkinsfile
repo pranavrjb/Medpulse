@@ -38,7 +38,9 @@ pipeline {
                     passwordVariable: 'HARBOR_PASS'
                 )]) {
                     sh '''
-                    docker login ${HARBOR_URL} -u "$HARBOR_USER" --password-stdin
+                    echo "$HARBOR_PASS" | docker login ${HARBOR_URL} -u "$HARBOR_USER" --password-stdin
+                    rm -f harbor-pass.txt
+                    
                     docker tag ${FRONTEND_IMAGE}:${IMAGE_TAG} ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
                     docker push ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
 
@@ -68,4 +70,20 @@ pipeline {
             }
         }
     }
+    post{
+    success{
+        mail (
+            to: 'pranav.rjb79@gmail.com',
+            subject: "Jenkins Job: ${currentBuild.fullDisplayName} - SUCCESS",
+            body: "The Medpulse application pipeline finished successfully! Access the build details here: ${env.BUILD_URL}"
+        )
+    }
+    failure{
+        mail (
+            to: 'pranav.rjb79@gmail.com',
+            subject: "Jenkins Job: ${currentBuild.fullDisplayName} - FAILURE",
+            body: "The Medpulse application pipeline failed. Access the build details here: ${env.BUILD_URL}"
+        )
+    }
+}
 }

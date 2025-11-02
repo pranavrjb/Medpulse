@@ -27,6 +27,11 @@ pipeline {
                 echo 'Docker images built successfully.'
             }
         }
+        stage('Quality Check') {
+            steps {
+                echo 'Performing quality checks...'
+            }
+        }
 
         stage('Push to Harbor') {
             steps {

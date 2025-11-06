@@ -77,14 +77,14 @@ pipeline {
     post{
     success{
         mail (
-            to: 'pranav.rjb79@gmail.com',
+            to: 'pranavrjb29@gmail.com',
             subject: "Jenkins Job: ${currentBuild.fullDisplayName} - SUCCESS",
             body: "The Medpulse application pipeline finished successfully! Access the build details here: ${env.BUILD_URL}"
         )
     }
     failure{
         mail (
-            to: 'pranav.rjb79@gmail.com',
+            to: 'pranavrjb29@gmail.com',
             subject: "Jenkins Job: ${currentBuild.fullDisplayName} - FAILURE",
             body: "The Medpulse application pipeline failed. Access the build details here: ${env.BUILD_URL}"
         )

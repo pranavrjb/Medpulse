@@ -29,32 +29,41 @@ pipeline {
             }
         }
 
-        stage('Push to Harbor') {
-            steps {
-                echo 'Pushing Docker images to Harbor...'
-                withCredentials([usernamePassword(
-                    credentialsId: 'HarborRegistryCred',
-                    usernameVariable: 'HARBOR_USER',
-                    passwordVariable: 'HARBOR_PASS'
-                )]) {
-                    sh '''
-                    echo "$HARBOR_PASS" | docker login ${HARBOR_URL} -u "$HARBOR_USER" --password-stdin
+        stage('Build & Push to Harbor') {
+    steps {
+        echo 'Building and pushing Docker images to Harbor using Buildx (OCI format)...'
 
-                    docker tag ${FRONTEND_IMAGE} ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
-                    docker push ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
+        withCredentials([usernamePassword(
+            credentialsId: 'HarborRegistryCred',
+            usernameVariable: 'HARBOR_USER',
+            passwordVariable: 'HARBOR_PASS'
+        )]) {
+            sh '''
+            echo "$HARBOR_PASS" | docker login ${HARBOR_URL} -u "$HARBOR_USER" --password-stdin
 
-                    docker tag ${BACKEND_IMAGE} ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
-                    docker push ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
+            # Ensure Buildx builder exists
+            docker buildx create --name medpulse_builder --use || docker buildx use medpulse_builder
 
-                    docker tag ${MONGO_IMAGE} ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
-                    docker push ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
+            # Build & push backend image
+            docker buildx build \
+              --platform linux/amd64 \
+              --provenance=false \
+              --push \
+              -t ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG} ./backend
 
-                    echo "Logout from Harbor..."
-                    docker logout ${HARBOR_URL}
-                    '''
-                }
-            }
+            # Build & push frontend image
+            docker buildx build \
+              --platform linux/amd64 \
+              --provenance=false \
+              --push \
+              -t ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG} ./frontend
+
+            docker logout ${HARBOR_URL}
+            '''
         }
+    }
+}
+
 
         stage('Deploy') {
             steps {

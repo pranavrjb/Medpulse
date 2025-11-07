@@ -2,6 +2,8 @@ pipeline {
     agent { label 'worker' }
 
     environment {
+        DOCKER_BUILDKIT = '1'
+        COMPOSE_DOCKER_CLI_BUILD = '1'
         HARBOR_URL = 'harbor.local.registry'
         PROJECT_NAME = 'medpulse'
         FRONTEND_IMAGE = 'medpulse-frontend'
@@ -15,28 +17,21 @@ pipeline {
             steps {
                 echo 'Checking out code from the GitHub repository...'
                 git url: "https://github.com/pranavrjb/Medpulse.git", branch: "feature/Jenkins"
-                echo 'Code checkout completed.'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building Docker images...'
+                echo 'Building Docker images with BuildKit...'
                 sh 'docker compose down'
                 sh 'docker compose build'
-                echo 'Docker images built successfully.'
-            }
-        }
-        stage('Quality Check') {
-            steps {
-                echo 'Performing quality checks...'
+                echo 'Docker images built successfully with BuildKit.'
             }
         }
 
         stage('Push to Harbor') {
             steps {
                 echo 'Pushing Docker images to Harbor...'
-
                 withCredentials([usernamePassword(
                     credentialsId: 'HarborRegistryCred',
                     usernameVariable: 'HARBOR_USER',
@@ -45,35 +40,29 @@ pipeline {
                     sh '''
                     echo "$HARBOR_PASS" | docker login ${HARBOR_URL} -u "$HARBOR_USER" --password-stdin
 
-                    docker tag ${FRONTEND_IMAGE} ${HARBOR_URL}/medpulse/${FRONTEND_IMAGE}:latest
-                    docker push ${HARBOR_URL}/medpulse/${FRONTEND_IMAGE}:latest
+                    docker tag ${FRONTEND_IMAGE} ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
+                    docker push ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
 
-                    docker tag ${BACKEND_IMAGE} ${HARBOR_URL}/medpulse/${BACKEND_IMAGE}:latest
-                    docker push ${HARBOR_URL}/medpulse/${BACKEND_IMAGE}:latest
+                    docker tag ${BACKEND_IMAGE} ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
+                    docker push ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
 
-                    docker tag ${MONGO_IMAGE} ${HARBOR_URL}/medpulse/mongo:4.4
-                    docker push ${HARBOR_URL}/medpulse/mongo:4.4
+                    docker tag ${MONGO_IMAGE} ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
+                    docker push ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
 
-                        echo " Logging out..."
-                        docker logout ${HARBOR_URL}
+                    echo "Logout from Harbor..."
+                    docker logout ${HARBOR_URL}
                     '''
                 }
             }
         }
 
-        stage('Test') {
-            steps {
-                echo 'Running tests...'
-            }
-        }
-
         stage('Deploy') {
             steps {
-                echo 'Deploying application...'
                 sh 'docker compose up -d'
             }
         }
     }
+
     post{
     success{
         mail (

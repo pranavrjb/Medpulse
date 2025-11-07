@@ -49,8 +49,39 @@ mongoose.connect(process.env.MONGO_URI, {
   .catch((err) => console.error('MongoDB Connection Failed!', err.message));
 // Prometheus metrics setup
 
-const collectDefaultMetrics = client.collectDefaultMetrics;
-collectDefaultMetrics();
+// 1. Create a registry to hold all your custom metrics
+const register = new client.Registry();
+
+// 2. Enable the default metrics (CPU, memory, garbage collection, etc.)
+// These provide critical operational insight without writing custom code.
+client.collectDefaultMetrics({ register });
+
+// 3. Define a custom metric (e.g., a Counter for total requests)
+const httpRequestCounter = new client.Counter({
+    name: 'http_requests_total',
+    help: 'Total number of HTTP requests processed',
+    labelNames: ['method', 'route', 'status_code'],
+    registers: [register],
+});
+
+// 4. Create an endpoint for Prometheus to scrape
+app.get('/metrics', async (req, res) => {
+    res.set('Content-Type', register.contentType);
+    res.end(await register.metrics());
+});
+
+// 5. Add middleware to track requests (example)
+app.use((req, res, next) => {
+    // Record the metric before sending the response
+    res.on('finish', () => {
+        httpRequestCounter.inc({
+            method: req.method,
+            route: req.path,
+            status_code: res.statusCode,
+        });
+    });
+    next();
+});
 
 app.get('/metrics', async (req, res) => {
   res.set('Content-Type', client.register.contentType);

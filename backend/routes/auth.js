@@ -45,16 +45,16 @@ router.post('/register', async (req, res) => {
     try {
 
         const existUser = await User.findOne({ email });
-        if (existUser) return res.status(200).json({ message: "User already exists!" });
+        if (existUser) return res.status(409).json({ message: "User already exists!" });
 
         const hashPassword = await bcrypt.hash(password, 10);
         
         const newUser = new User({ name, email, password: hashPassword });
         await newUser.save();
-
+        const { password: hashedPassword, ...userWithoutPassword } = newUser.toObject();
         const token = jwt.sign({ id: newUser._id, email: newUser.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
  
-        res.status(210).json({ user: userWithoutPassword, token });
+        res.status(201).json({ user: userWithoutPassword, token });
     } catch (error) {
         console.error("Signup error:", error.message);
         res.status(500).json({ message: "Something Went Wrong!" });

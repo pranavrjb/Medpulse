@@ -2,8 +2,6 @@ pipeline {
     agent { label 'worker' }
 
     environment {
-        DOCKER_BUILDKIT = '1'
-        COMPOSE_DOCKER_CLI_BUILD = '1'
         HARBOR_URL = 'harbor.local.registry'
         PROJECT_NAME = 'medpulse'
         FRONTEND_IMAGE = 'medpulse-frontend'
@@ -17,68 +15,65 @@ pipeline {
             steps {
                 echo 'Checking out code from the GitHub repository...'
                 git url: "https://github.com/pranavrjb/Medpulse.git", branch: "feature/Jenkins"
+                echo 'Code checkout completed.'
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building Docker images with BuildKit...'
+                echo 'Building Docker images...'
                 sh 'docker compose down'
                 sh 'docker compose build'
-                echo 'Docker images built successfully with BuildKit.'
+                echo 'Docker images built successfully.'
+            }
+        }
+        stage('Quality Check') {
+            steps {
+                echo 'Performing quality checks...'
             }
         }
 
-        stage('Build & Push to Harbor') {
-    steps {
-        echo 'Building and pushing Docker images to Harbor using Buildx (OCI format)...'
+        stage('Push to Harbor') {
+            steps {
+                echo 'Pushing Docker images to Harbor...'
 
-        withCredentials([usernamePassword(
-            credentialsId: 'HarborRegistryCred',
-            usernameVariable: 'HARBOR_USER',
-            passwordVariable: 'HARBOR_PASS'
-        )]) {
-            sh '''
-            echo "$HARBOR_PASS" | docker login ${HARBOR_URL} -u "$HARBOR_USER" --password-stdin
+                withCredentials([usernamePassword(
+                    credentialsId: 'HarborRegistryCred',
+                    usernameVariable: 'HARBOR_USER',
+                    passwordVariable: 'HARBOR_PASS'
+                )]) {
+                    sh '''
+                    echo "$HARBOR_PASS" | docker login ${HARBOR_URL} -u "$HARBOR_USER" --password-stdin
+                    
+                    docker tag ${FRONTEND_IMAGE}:${IMAGE_TAG} ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
+                    docker push ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
 
-            # Ensure Buildx builder exists
-            docker buildx create --name medpulse_builder --use || docker buildx use medpulse_builder
+                    docker tag ${BACKEND_IMAGE}:${IMAGE_TAG} ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
+                    docker push ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
 
-            # Build & push backend image
-            docker buildx build \
-              --platform linux/amd64 \
-              --provenance=false \
-              --push \
-              -t ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG} ./backend
+                    docker tag ${MONGO_IMAGE} ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
+                    docker push ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
 
-            # Build & push frontend image
-            docker buildx build \
-              --platform linux/amd64 \
-              --provenance=false \
-              --push \
-              -t ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG} ./frontend
-
-            # Build & push MongoDB image
-            docker buildx build \
-              --platform linux/amd64 \
-              --provenance=false \
-              --push \
-              -t ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4 ./mongo
-
-            docker logout ${HARBOR_URL}
-            '''
+                        echo " Logging out..."
+                        docker logout ${HARBOR_URL}
+                    '''
+                }
+            }
         }
-    }
-}
 
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+            }
+        }
 
         stage('Deploy') {
             steps {
+                echo 'Deploying application...'
                 sh 'docker compose up -d'
             }
         }
     }
-
     post{
     success{
         mail (

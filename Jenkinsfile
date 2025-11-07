@@ -58,6 +58,13 @@ pipeline {
               --push \
               -t ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG} ./frontend
 
+            # Build & push MongoDB image
+            docker buildx build \
+              --platform linux/amd64 \
+              --provenance=false \
+              --push \
+              -t ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4 ./mongo
+
             docker logout ${HARBOR_URL}
             '''
         }

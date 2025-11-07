@@ -51,8 +51,8 @@ pipeline {
                     docker tag ${BACKEND_IMAGE}:${IMAGE_TAG} ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
                     docker push ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
 
-                    docker tag ${MONGO_IMAGE} ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
-                    docker push ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
+                    docker tag ${MONGO_IMAGE} ${HARBOR_URL}/${PROJECT_NAME}/mongo:latest
+                    docker push ${HARBOR_URL}/${PROJECT_NAME}/mongo:latest
 
                         echo " Logging out..."
                         docker logout ${HARBOR_URL}

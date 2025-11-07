@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: harbor.local.registry/medpulse/medpulse-backend:latest
+          image: harbor.local.registry/medpulse/medpulse-backend
           ports:
             - containerPort: 3001
       imagePullSecrets:

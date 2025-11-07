@@ -44,15 +44,15 @@ pipeline {
                 )]) {
                     sh '''
                     echo "$HARBOR_PASS" | docker login ${HARBOR_URL} -u "$HARBOR_USER" --password-stdin
-                    
-                    docker tag ${FRONTEND_IMAGE}:${IMAGE_TAG} ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
-                    docker push ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
 
-                    docker tag ${BACKEND_IMAGE}:${IMAGE_TAG} ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
-                    docker push ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
+                    docker tag ${FRONTEND_IMAGE} ${HARBOR_URL}/medpulse/${FRONTEND_IMAGE}:latest
+                    docker push ${HARBOR_URL}/medpulse/${FRONTEND_IMAGE}:latest
 
-                    docker tag ${MONGO_IMAGE} ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
-                    docker push ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
+                    docker tag ${BACKEND_IMAGE} ${HARBOR_URL}/medpulse/${BACKEND_IMAGE}:latest
+                    docker push ${HARBOR_URL}/medpulse/${BACKEND_IMAGE}:latest
+
+                    docker tag ${MONGO_IMAGE} ${HARBOR_URL}/medpulse/mongo:4.4
+                    docker push ${HARBOR_URL}/medpulse/mongo:4.4
 
                         echo " Logging out..."
                         docker logout ${HARBOR_URL}

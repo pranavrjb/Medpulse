@@ -13,20 +13,26 @@ pipeline {
     stages {
         stage('Code') {
             steps {
-                echo 'Checking out code from the GitHub repository...'
+                echo 'Checking out code from GitHub...'
                 git url: "https://github.com/pranavrjb/Medpulse.git", branch: "feature/Jenkins"
                 echo 'Code checkout completed.'
             }
         }
 
-        stage('Build') {
+        stage('Build Frontend Image') {
             steps {
-                echo 'Building Docker images...'
-                sh 'docker compose down'
-                sh 'docker compose build'
-                echo 'Docker images built successfully.'
+                echo 'Building Frontend Docker image...'
+                sh "docker build -t ${FRONTEND_IMAGE}:${IMAGE_TAG} ./frontend"
             }
         }
+
+        stage('Build Backend Image') {
+            steps {
+                echo 'Building Backend Docker image...'
+                sh "docker build -t ${BACKEND_IMAGE}:${IMAGE_TAG} ./backend"
+            }
+        }
+
         stage('Quality Check') {
             steps {
                 echo 'Performing quality checks...'
@@ -36,7 +42,6 @@ pipeline {
         stage('Push to Harbor') {
             steps {
                 echo 'Pushing Docker images to Harbor...'
-
                 withCredentials([usernamePassword(
                     credentialsId: 'HarborRegistryCred',
                     usernameVariable: 'HARBOR_USER',
@@ -54,8 +59,7 @@ pipeline {
                     docker tag ${MONGO_IMAGE} ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
                     docker push ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
 
-                        echo " Logging out..."
-                        docker logout ${HARBOR_URL}
+                    docker logout ${HARBOR_URL}
                     '''
                 }
             }
@@ -74,20 +78,21 @@ pipeline {
             }
         }
     }
-    post{
-    success{
-        mail (
-            to: 'pranavrjb29@gmail.com',
-            subject: "Jenkins Job: ${currentBuild.fullDisplayName} - SUCCESS",
-            body: "The Medpulse application pipeline finished successfully! Access the build details here: ${env.BUILD_URL}"
-        )
+
+    post {
+        success {
+            mail (
+                to: 'pranavrjb29@gmail.com',
+                subject: "Jenkins Job: ${currentBuild.fullDisplayName} - SUCCESS",
+                body: "Congratulations! The Medpulse application pipeline finished successfully! Access the build details here: ${env.BUILD_URL}"
+            )
+        }
+        failure {
+            mail (
+                to: 'pranavrjb29@gmail.com',
+                subject: "Jenkins Job: ${currentBuild.fullDisplayName} - FAILURE",
+                body: "Unfortunately, the Medpulse application pipeline has failed. Access the build details here: ${env.BUILD_URL}"
+            )
+        }
     }
-    failure{
-        mail (
-            to: 'pranavrjb29@gmail.com',
-            subject: "Jenkins Job: ${currentBuild.fullDisplayName} - FAILURE",
-            body: "The Medpulse application pipeline failed. Access the build details here: ${env.BUILD_URL}"
-        )
-    }
-}
 }

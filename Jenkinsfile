@@ -26,7 +26,7 @@ pipeline {
         echo 'Performing SonarQube analysis...'
         withSonarQubeEnv('local-sonarqube') {
             script {
-                def scannerHome = tool 'SonarScanner' 
+                def scannerHome = tool 'sonar7.2' 
                 sh """
                     ${scannerHome}/bin/sonar-scanner \
                     -Dsonar.host.url=http://192.168.56.23:9000 \

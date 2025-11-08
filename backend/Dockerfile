@@ -13,10 +13,10 @@ RUN npm ci
 COPY . .
 
 # Set environment variable for port
-ENV PORT=3001
+ENV PORT=5000
 
 # Expose port
-EXPOSE 3001
+EXPOSE 5000
 
 # Create a non-root user for security
 RUN adduser --disabled-password --gecos '' appuser

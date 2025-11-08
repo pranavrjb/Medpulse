@@ -19,7 +19,7 @@ const notificationRoutes = require('./routes/notifications');
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 
 // Create uploads directory if it doesn't exist
 if (!fs.existsSync('uploads')) {

@@ -18,8 +18,9 @@ ENV PORT=3001
 # Expose port
 EXPOSE 3001
 
-# Create a non-root user for security
+# Optional: Create non-root user
 RUN adduser --disabled-password --gecos '' appuser
 USER appuser
 
-CMD ["npm", "run", "dev"]
+# Run the backend directly
+CMD ["node", "server.js"]

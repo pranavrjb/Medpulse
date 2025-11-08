@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   mongo:
     image: harbor.local.registry/medpulse/mongo:4.4

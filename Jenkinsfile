@@ -84,7 +84,7 @@ stage('Run Ansible Playbook') {
     steps {
         sh '''
         echo "Activating Ansible virtual environment..."
-        sudo cd /home/vagrant
+        cd /home/vagrant
         source ansible_env/bin/activate
         echo "Running Ansible playbook..."   
         cd /home/vagrant/ansible_env

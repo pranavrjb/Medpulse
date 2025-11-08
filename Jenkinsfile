@@ -8,9 +8,9 @@ pipeline {
         BACKEND_IMAGE = 'medpulse-backend'
         MONGO_IMAGE = 'mongo:4.4'
         IMAGE_TAG = 'latest'
-        ANSIBLE_BIN = '/home/vagrant/ansible_env/bin/ansible-playbook'
-        PLAYBOOK = '/home/vagrant/ansible_env/master.yaml'
-        INVENTORY = '/home/vagrant/ansible_env/inventory.ini'
+        ANSIBLE_BIN = '/opt/ansible_env/bin/ansible-playbook'
+        PLAYBOOK = '/opt/ansible_env/master.yaml'
+        INVENTORY = '/opt/ansible_env/inventory.ini'
     }
 
     stages {
@@ -84,11 +84,8 @@ stage('Run Ansible Playbook') {
     steps {
         sh '''
         echo "Activating Ansible virtual environment..."
-        cd /home/vagrant
-        source ansible_env/bin/activate
-        echo "Running Ansible playbook..."   
-        cd /home/vagrant/ansible_env
-        ansible-playbook -i inventory.ini master.yaml -vvv
+        cd /opt/ansible_env
+        ansible-playbook -i inventory.ini master.yaml
         '''
     }
 }

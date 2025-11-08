@@ -69,6 +69,7 @@ pipeline {
             }
         }
 stage('Debug Environment') {
+    agent any
     steps {
         sh '''
         echo "Running on node: $(hostname)"

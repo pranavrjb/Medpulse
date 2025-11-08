@@ -80,7 +80,7 @@ stage('Debug Environment') {
     }
 }
 stage('Run Ansible Playbook') {
-    agent any
+    agent {label 'master'}
     steps {
         sh '''
         echo "Activating Ansible virtual environment..."

@@ -68,6 +68,16 @@ pipeline {
                 }
             }
         }
+stage('Debug Environment') {
+    steps {
+        sh '''
+        echo "Running on node: $(hostname)"
+        echo "Current user: $(whoami)"
+        echo "Checking for Ansible venv path..."
+        ls -ld /home/vagrant/ansible_env || echo "ansible_env not found on this node"
+        '''
+    }
+}
 
 stage('Run Ansible Playbook') {
     steps {

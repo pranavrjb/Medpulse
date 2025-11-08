@@ -69,15 +69,22 @@ pipeline {
             }
         }
 
-        stage('Run Ansible Playbook') {
-            steps {
-                echo 'Deploying application...'
-                sh '''
-                source ${ANSIBLE_VENV}
-                ansible-playbook -i ${INVENTORY} ${PLAYBOOK}
-                '''
-            }
-        }
+    stage('Run Ansible Playbook') {
+    steps {
+        echo 'Deploying application via Ansible...'
+        sh '''
+        #!/bin/bash
+        set -e
+
+        echo "Activating Ansible virtual environment..."
+        source ${ANSIBLE_VENV}
+
+        echo "Running Ansible playbook..."
+        ansible-playbook -i ${INVENTORY} ${PLAYBOOK} -vvv
+        '''
+    }
+}
+
     }
 
     post {

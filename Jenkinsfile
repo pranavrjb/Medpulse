@@ -25,17 +25,21 @@ pipeline {
     steps {
         echo 'Performing SonarQube analysis...'
         withSonarQubeEnv('local-sonarqube') {
-            sh '''
-                sonar-scanner \
-                -Dsonar.host.url=http://192.168.56.23:9000 \
-                -Dsonar.login=sqp_47e82ce89698b3d1242210ac904c43f796ebcde3 \
-                -Dsonar.projectKey=Medpulse \
-                -Dsonar.projectName=Medpulse \
-                -Dsonar.sources=.
-            '''
+            script {
+                def scannerHome = tool 'SonarScanner' 
+                sh """
+                    ${scannerHome}/bin/sonar-scanner \
+                    -Dsonar.host.url=http://192.168.56.23:9000 \
+                    -Dsonar.login=${SONAR_AUTH_TOKEN} \
+                    -Dsonar.projectKey=Medpulse \
+                    -Dsonar.projectName=Medpulse \
+                    -Dsonar.sources=.
+                """
+            }
         }
     }
 }
+
 
         stage('Build Frontend Image') {
             steps {

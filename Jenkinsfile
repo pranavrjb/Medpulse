@@ -73,7 +73,7 @@ stage('Run Ansible Playbook') {
     steps {
         echo 'Deploying application via Ansible...'
         sh '''
-        /home/vagrant/ansible_env/bin/ansible-playbook \
+        /home/vagrant/ansible_env/bin/ansible_env \
           -i /home/vagrant/ansible_env/inventory.ini \
           /home/vagrant/ansible_env/master.yaml -vvv
         '''

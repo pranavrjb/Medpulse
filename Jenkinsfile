@@ -17,10 +17,29 @@ pipeline {
         stage('Code Checkout') {
             steps {
                 echo 'Checking out code from GitHub...'
-                git url: "https://github.com/pranavrjb/Medpulse.git", branch: "feature/Jenkins"
+                git url: "https://github.com/pranavrjb/Medpulse.git", branch: "sonar"
                 echo 'Code checkout completed.'
             }
         }
+    stage('SonarQube Analysis') {
+    steps {
+        echo 'Performing SonarQube analysis...'
+        withSonarQubeEnv('local-sonarqube') {
+            script {
+                def scannerHome = tool 'sonar7.2' 
+                sh """
+                    ${scannerHome}/bin/sonar-scanner \
+                    -Dsonar.host.url=http://192.168.56.23:9000 \
+                    -Dsonar.login=${SONAR_AUTH_TOKEN} \
+                    -Dsonar.projectKey=Medpulse \
+                    -Dsonar.projectName=Medpulse \
+                    -Dsonar.sources=.
+                """
+            }
+        }
+    }
+}
+
 
         stage('Build Frontend Image') {
             steps {
@@ -33,13 +52,6 @@ pipeline {
             steps {
                 echo 'Building Backend Docker image...'
                 sh "docker build -t ${BACKEND_IMAGE}:${IMAGE_TAG} ./backend"
-            }
-        }
-
-        stage('Quality Check') {
-            steps {
-                echo 'Performing quality checks...'
-                // You can integrate linters/tests here
             }
         }
 

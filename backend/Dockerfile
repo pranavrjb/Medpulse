@@ -1,4 +1,4 @@
-FROM node:18-alpine
+FROM node:18-slim
 
 # Set working directory
 WORKDIR /app
@@ -7,19 +7,20 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies
-RUN npm install --legacy-peer-deps
+RUN npm ci
 
 # Copy rest of the code
 COPY . .
 
 # Set environment variable for port
-ENV PORT=3001
+ENV PORT=5000
 
 # Expose port
-EXPOSE 3001
+EXPOSE 5000
 
-# Create a non-root user for security
+# Optional: Create non-root user
 RUN adduser --disabled-password --gecos '' appuser
 USER appuser
 
-CMD ["npm", "run", "dev"]
+# Run the backend directly
+CMD ["node", "server.js"]

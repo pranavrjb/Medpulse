@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   mongo:
     image: harbor.local.registry/medpulse/mongo:4.4
@@ -28,12 +26,13 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 10s
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    #   start_period: 30s
+
 
   frontend:
     image: harbor.local.registry/medpulse/medpulse-frontend:latest

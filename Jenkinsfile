@@ -21,16 +21,34 @@ pipeline {
                 echo 'Code checkout completed.'
             }
         }
-
-        stage('Build') {
-            steps {
-                echo 'Building Docker images...'
-                sh 'docker compose down'
-                sh 'docker compose build'
-                echo 'Docker images built successfully.'
+    stage('SonarQube Analysis') {
+    steps {
+        echo 'Performing SonarQube analysis...'
+        withSonarQubeEnv('local-sonarqube') {
+            script {
+                def scannerHome = tool 'sonar7.2' 
+                sh """
+                    ${scannerHome}/bin/sonar-scanner \
+                    -Dsonar.host.url=http://192.168.56.23:9000 \
+                    -Dsonar.login=${SONAR_AUTH_TOKEN} \
+                    -Dsonar.projectKey=Medpulse \
+                    -Dsonar.projectName=Medpulse \
+                    -Dsonar.sources=.
+                """
             }
         }
-        stage('Quality Check') {
+    }
+}
+
+
+        stage('Build Frontend Image') {
+            steps {
+                echo 'Building Frontend Docker image...'
+                sh "docker build -t ${FRONTEND_IMAGE}:${IMAGE_TAG} ./frontend"
+            }
+        }
+
+        stage('Build Backend Image') {
             steps {
                 echo 'Building Backend Docker image...'
                 sh "docker build -t ${BACKEND_IMAGE}:${IMAGE_TAG} ./backend"

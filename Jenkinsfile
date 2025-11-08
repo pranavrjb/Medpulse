@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'worker' }
+    agent any
 
     environment {
         HARBOR_URL = 'harbor.local.registry'
@@ -79,19 +79,19 @@ stage('Debug Environment') {
         '''
     }
 }
-// stage('Run Ansible Playbook') {
-//     agent any
-//     steps {
-//         sh '''
-//         echo "Activating Ansible virtual environment..."
-//         cd /home/vagrant
-//         source ansible_env/bin/activate
-//         echo "Running Ansible playbook..."   
-//         cd /home/vagrant/ansible_env
-//         ansible-playbook -i inventory.ini master.yaml -vvv
-//         '''
-//     }
-// }
+stage('Run Ansible Playbook') {
+    agent any
+    steps {
+        sh '''
+        echo "Activating Ansible virtual environment..."
+        cd /home/vagrant
+        source ansible_env/bin/activate
+        echo "Running Ansible playbook..."   
+        cd /home/vagrant/ansible_env
+        ansible-playbook -i inventory.ini master.yaml -vvv
+        '''
+    }
+}
 
     }
 

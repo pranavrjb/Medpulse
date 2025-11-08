@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'worker' }
 
     environment {
         HARBOR_URL = 'harbor.local.registry'

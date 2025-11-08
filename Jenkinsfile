@@ -80,7 +80,7 @@ stage('Debug Environment') {
 }
 
 stage('Run Ansible Playbook') {
-    agent { label 'master' } 
+    agent any
     steps {
         sh '''
         bash -c "

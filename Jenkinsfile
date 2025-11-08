@@ -75,23 +75,22 @@ stage('Debug Environment') {
         echo "Current user: $(whoami)"
         echo "Current directory: $(pwd)"
         echo "Checking for Ansible venv path..."
-        ls -ld /home/vagrant/ansible_env || echo "ansible_env not found on this node"
         '''
     }
 }
-stage('Run Ansible Playbook') {
-    agent any
-    steps {
-        sh '''
-        echo "Activating Ansible virtual environment..."
-        cd /home/vagrant
-        source ansible_env/bin/activate
-        echo "Running Ansible playbook..."   
-        cd /home/vagrant/ansible_env
-        ansible-playbook -i inventory.ini master.yaml -vvv
-        '''
-    }
-}
+// stage('Run Ansible Playbook') {
+//     agent any
+//     steps {
+//         sh '''
+//         echo "Activating Ansible virtual environment..."
+//         cd /home/vagrant
+//         source ansible_env/bin/activate
+//         echo "Running Ansible playbook..."   
+//         cd /home/vagrant/ansible_env
+//         ansible-playbook -i inventory.ini master.yaml -vvv
+//         '''
+//     }
+// }
 
     }
 

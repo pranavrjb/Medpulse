@@ -80,20 +80,17 @@ stage('Debug Environment') {
 }
 
 stage('Run Ansible Playbook') {
+    agent { label 'master' } 
     steps {
-        echo 'Deploying application via Ansible...'
         sh '''
-            # Use bash shell instead of sh
-            bash -c "
-                set -e
-                echo Activating Ansible virtual environment...
-                source /home/vagrant/ansible_env/bin/activate
-                echo Running Ansible playbook...
-                ansible-playbook -i /home/vagrant/ansible_env/inventory.ini /home/vagrant/ansible_env/master.yaml -vvv
-            "
+        bash -c "
+            source /home/vagrant/ansible_env/bin/activate &&
+            ansible-playbook -i /home/vagrant/ansible_env/inventory.ini /home/vagrant/ansible_env/master.yaml -vvv
+        "
         '''
     }
 }
+
 
     }
 

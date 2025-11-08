@@ -14,7 +14,7 @@ pipeline {
         stage('Code') {
             steps {
                 echo 'Checking out code from the GitHub repository...'
-                git url: "https://github.com/pranavrjb/Medpulse.git", branch: "feature/Jenkins"
+                git url: "https://github.com/pranavrjb/Medpulse.git"
                 echo 'Code checkout completed.'
             }
         }

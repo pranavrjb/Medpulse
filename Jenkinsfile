@@ -8,6 +8,10 @@ pipeline {
         BACKEND_IMAGE = 'medpulse-backend'
         MONGO_IMAGE = 'mongo:4.4'
         IMAGE_TAG = 'latest'
+        ANSIBLE_VENV = '/home/vagrant/ansible_env/bin/activate'
+        PLAYBOOK= '/home/vagrant/ansible_env/master.yaml'
+        INVENTORY= '/home/vagrant/ansible_env/inventory.ini'
+
     }
 
     stages {
@@ -65,16 +69,13 @@ pipeline {
             }
         }
 
-        stage('Test') {
-            steps {
-                echo 'Running tests...'
-            }
-        }
-
-        stage('Deploy') {
+        stage('Run Ansible Playbook') {
             steps {
                 echo 'Deploying application...'
-                sh 'docker compose up -d'
+                sh '''
+                source ${ANSIBLE_VENV}
+                ansible-playbook -i ${INVENTORY} ${PLAYBOOK}
+                '''
             }
         }
     }

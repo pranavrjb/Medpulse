@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'worker' }
+    agent any
 
     environment {
         HARBOR_URL = 'harbor.local.registry'
@@ -84,7 +84,7 @@ stage('Run Ansible Playbook') {
     steps {
         sh '''
         echo "Activating Ansible virtual environment..."
-        cd /home/vagrant
+        sudo cd /home/vagrant
         source ansible_env/bin/activate
         echo "Running Ansible playbook..."   
         cd /home/vagrant/ansible_env

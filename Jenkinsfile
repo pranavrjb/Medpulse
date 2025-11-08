@@ -77,7 +77,7 @@ pipeline {
         set -e
 
         echo "Activating Ansible virtual environment..."
-        source ${ANSIBLE_VENV}
+        . ${ANSIBLE_VENV}
 
         echo "Running Ansible playbook..."
         ansible-playbook -i ${INVENTORY} ${PLAYBOOK} -vvv

@@ -79,16 +79,17 @@ stage('Debug Environment') {
     }
 }
 stage('Run Ansible Playbook') {
-    agent any
+    agent { label 'ansible-deployer' }
     steps {
         sh '''
         echo "Activating Ansible virtual environment..."
-        source /var/lib/jenkins/ansible_env/bin/activate
+        source /home/vagrant/ansible_env/bin/activate
         echo "Running Ansible playbook..."
-        ansible-playbook -i /var/lib/jenkins/ansible_env/inventory.ini /var/lib/jenkins/ansible_env/master.yaml -vvv
+        ansible-playbook -i /home/vagrant/ansible_env/inventory.ini /home/vagrant/ansible_env/master.yaml -vvv
         '''
     }
 }
+
 
     }
 

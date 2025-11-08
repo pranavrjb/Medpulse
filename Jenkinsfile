@@ -69,7 +69,7 @@ pipeline {
             }
         }
 
-    stage('Run Ansible Playbook') {
+stage('Run Ansible Playbook') {
     steps {
         echo 'Deploying application via Ansible...'
         sh '''
@@ -77,13 +77,14 @@ pipeline {
         set -e
 
         echo "Activating Ansible virtual environment..."
-        . ${ANSIBLE_VENV}
+        source /home/vagrant/ansible_env/bin/activate
 
         echo "Running Ansible playbook..."
-        ansible-playbook -i ${INVENTORY} ${PLAYBOOK} -vvv
+        ansible-playbook -i /home/vagrant/ansible_env/inventory.ini /home/vagrant/ansible_env/master.yaml -vvv
         '''
     }
 }
+
 
     }
 

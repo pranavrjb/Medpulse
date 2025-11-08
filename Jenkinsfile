@@ -79,7 +79,7 @@ stage('Debug Environment') {
     }
 }
 stage('Run Ansible Playbook') {
-    agent { label 'ansible-deployer' }
+    agent any
     steps {
         sh '''
 

@@ -1,6 +1,8 @@
+version: "3.9"
+
 services:
   mongo:
-    image: mongo:4.4
+    image: harbor.local.registry/medpulse/mongo:4.4
     container_name: mongo
     restart: unless-stopped
     ports:
@@ -15,7 +17,7 @@ services:
       start_period: 10s
 
   backend:
-    build: ./backend
+    image: harbor.local.registry/medpulse/medpulse-backend:latest
     container_name: backend
     restart: unless-stopped
     ports:
@@ -23,9 +25,6 @@ services:
     environment:
       - MONGO_URI=mongodb://mongo:27017/demo
       - PORT=3001
-    volumes:
-      - ./backend:/app
-      - /app/node_modules
     depends_on:
       mongo:
         condition: service_healthy
@@ -37,16 +36,14 @@ services:
       start_period: 10s
 
   frontend:
-    build: ./frontend
+    image: harbor.local.registry/medpulse/medpulse-frontend:latest
     container_name: frontend
     restart: unless-stopped
     ports:
       - "5173:5173"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:5173"]
       interval: 10s

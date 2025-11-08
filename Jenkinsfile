@@ -8,10 +8,13 @@ pipeline {
         BACKEND_IMAGE = 'medpulse-backend'
         MONGO_IMAGE = 'mongo:4.4'
         IMAGE_TAG = 'latest'
+        ANSIBLE_BIN = '/opt/ansible_env/bin/ansible-playbook'
+        PLAYBOOK = '/opt/ansible_env/master.yaml'
+        INVENTORY = '/opt/ansible_env/inventory.ini'
     }
 
     stages {
-        stage('Code') {
+        stage('Code Checkout') {
             steps {
                 echo 'Checking out code from GitHub...'
                 git url: "https://github.com/pranavrjb/Medpulse.git", branch: "feature/Jenkins"
@@ -19,23 +22,18 @@ pipeline {
             }
         }
 
-        stage('Build Frontend Image') {
+        stage('Build') {
             steps {
-                echo 'Building Frontend Docker image...'
-                sh "docker build -t ${FRONTEND_IMAGE}:${IMAGE_TAG} ./frontend"
+                echo 'Building Docker images...'
+                sh 'docker compose down'
+                sh 'docker compose build'
+                echo 'Docker images built successfully.'
             }
         }
-
-        stage('Build Backend Image') {
+        stage('Quality Check') {
             steps {
                 echo 'Building Backend Docker image...'
                 sh "docker build -t ${BACKEND_IMAGE}:${IMAGE_TAG} ./backend"
-            }
-        }
-
-        stage('Quality Check') {
-            steps {
-                echo 'Performing quality checks...'
             }
         }
 
@@ -49,7 +47,7 @@ pipeline {
                 )]) {
                     sh '''
                     echo "$HARBOR_PASS" | docker login ${HARBOR_URL} -u "$HARBOR_USER" --password-stdin
-                    
+
                     docker tag ${FRONTEND_IMAGE}:${IMAGE_TAG} ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
                     docker push ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
 
@@ -64,19 +62,28 @@ pipeline {
                 }
             }
         }
+stage('Debug Environment') {
+    agent any
+    steps {
+        sh '''
+        echo "Running on node: $(hostname)"
+        echo "Current user: $(whoami)"
+        echo "Current directory: $(pwd)"
+        echo "Checking for Ansible venv path..."
+        '''
+    }
+}
+stage('Run Ansible Playbook') {
+    agent {label 'master'}
+    steps {
+        sh '''
+        echo "Activating Ansible virtual environment..."
+        cd /opt/ansible_env
+        ansible-playbook -i inventory.ini master.yaml
+        '''
+    }
+}
 
-        stage('Test') {
-            steps {
-                echo 'Running tests...'
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                echo 'Deploying application...'
-                sh 'docker compose up -d'
-            }
-        }
     }
 
     post {

@@ -6,6 +6,7 @@ const createHttpError = require('http-errors');
 const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
+const client = require('prom-client');
 
 const authRoutes = require('./routes/auth');
 const bookingRoutes = require('./routes/bookings');
@@ -47,6 +48,9 @@ mongoose.connect(process.env.MONGO_URI, {
   .then(() => console.log('MongoDB is connected!'))
   .catch((err) => console.error('MongoDB Connection Failed!', err.message));
 
+const collectDefaultMetrics = client.collectDefaultMetrics;
+collectDefaultMetrics({ timeout: 5000 });
+
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
@@ -57,6 +61,11 @@ app.get('/', (req, res) => {
   res.send('Welcome to appointment booking API!');
 });
 
+// Metrics endpoint
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', client.register.contentType);
+  res.end(await client.register.metrics());
+});
 // API Routes
 app.use('/auth', authRoutes);
 app.use('/contacts', contactRoutes);

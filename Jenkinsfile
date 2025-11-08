@@ -73,6 +73,7 @@ stage('Debug Environment') {
         sh '''
         echo "Running on node: $(hostname)"
         echo "Current user: $(whoami)"
+        echo "Current directory: $(pwd)"
         echo "Checking for Ansible venv path..."
         ls -ld /home/vagrant/ansible_env || echo "ansible_env not found on this node"
         '''
@@ -86,7 +87,7 @@ stage('Run Ansible Playbook') {
         echo "Activating Ansible virtual environment..."
         source /home/vagrant/ansible_env/bin/activate
         echo "Running Ansible playbook..."
-        echo "Current directory: $(pwd)"
+        
         cd /home/vagrant/ansible_env
         ansible-playbook -i inventory.ini master.yaml -vvv
         '''

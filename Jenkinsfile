@@ -85,9 +85,8 @@ stage('Run Ansible Playbook') {
         sh '''
 
         echo "Activating Ansible virtual environment..."
-        source /home/vagrant/ansible_env/bin/activate
-        echo "Running Ansible playbook..."
-        
+        sudo source /home/vagrant/ansible_env/bin/activate
+        echo "Running Ansible playbook..."   
         cd /home/vagrant/ansible_env
         ansible-playbook -i inventory.ini master.yaml -vvv
         '''

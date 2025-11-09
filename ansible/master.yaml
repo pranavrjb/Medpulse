@@ -1,0 +1,6 @@
+---
+- name: Deploy Medpulse Application
+  hosts: deployment_VM
+  become: yes
+  roles:
+    - app_deployer

@@ -1,0 +1,13 @@
+---
+app_name: medpulse
+app_path: /opt/{{app_name}}
+local_compose_path: ../ansible_env/Medpulse/docker-compose.yml
+
+harbor_url: harbor.local.registry
+harbor_user: admin
+harbor_pass: Harbor12345
+project_name: medpulse
+
+frontend_image: medpulse-frontend
+backend_image: medpulse-backend
+mongo_image: mongo

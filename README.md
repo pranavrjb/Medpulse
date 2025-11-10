@@ -74,29 +74,29 @@ Ansible installed and SSH access to the deployment server
    git clone https://github.com/pranavrjb/Medpulse.git
    cd Medpulse
 
-**2. Start the Docker Containers**
- ```bash
+2. **Start the Docker Containers**
+  ```bash
    sudo docker compose up -d
  ```
-**4. Access Jenkins**
+3. **Access Jenkins**
 
-    URL: http://localhost:8080
-    
-    Configure Jenkins pipeline using the Jenkinsfile provided in this repository.
+URL: http://localhost:8080
 
-**5. Run SonarQube Analysis**
+Configure Jenkins pipeline using the Jenkinsfile provided in this repository.
 
-    Jenkins automatically triggers SonarQube analysis during the pipeline build stage.
+4. **Run SonarQube Analysis**
 
-**6. Deploy with Ansible**
+Jenkins automatically triggers SonarQube analysis during the pipeline build stage.
+
+5. **Deploy with Ansible**
 ```bash 
 ansible-playbook -i inventory.ini master.yml
 ```
 
-**7. Monitor Metrics**
+6. **Monitor Metrics**
 
-    **Prometheus**: http://localhost:9090
+**Prometheus**: http://localhost:9090
     
-    **Grafana**: http://localhost:3000
+**Grafana**: http://localhost:3000
    
 

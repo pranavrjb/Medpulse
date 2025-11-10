@@ -1,26 +1,14 @@
 FROM node:18-slim
-
-# Set working directory
 WORKDIR /app
-
-# Copy package.json and package-lock.json first
 COPY package*.json ./
-
-# Install dependencies
 RUN npm ci
-
-# Copy rest of the code
+# Copy the rest of the application code
 COPY . .
-
-# Set environment variable for port
+# Build the application
 ENV PORT=5000
-
-# Expose port
 EXPOSE 5000
-
 # Optional: Create non-root user
 RUN adduser --disabled-password --gecos '' appuser
 USER appuser
-
-# Run the backend directly
+# Start the server
 CMD ["node", "server.js"]

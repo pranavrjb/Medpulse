@@ -71,11 +71,11 @@ Ansible installed and SSH access to the deployment server
    sudo docker compose up -d
  ```
 **4. Access Jenkins**
-URL: http://localhost:8080
-Configure Jenkins pipeline using the Jenkinsfile provided in this repository.
+    URL: http://localhost:8080
+    Configure Jenkins pipeline using the Jenkinsfile provided in this repository.
 
 **5. Run SonarQube Analysis**
-Jenkins automatically triggers SonarQube analysis during the pipeline build stage.
+    Jenkins automatically triggers SonarQube analysis during the pipeline build stage.
 
 **6. Deploy with Ansible**
 ```bash 
@@ -83,7 +83,7 @@ ansible-playbook -i inventory.ini master.yml
 ```
 
 **7. Monitor Metrics**
-**Prometheus**: http://localhost:9090
-**Grafana**: http://localhost:3000
+    **Prometheus**: http://localhost:9090
+    **Grafana**: http://localhost:3000
    
 

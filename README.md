@@ -8,17 +8,25 @@ The goal is to automate the process of building, testing, analyzing, deploying, 
 ### **💻 Application Tech Stack**
 #### **Technology	Purpose**
 **MongoDB**	Database for storing application data
+
 **Express.js**	Backend framework for handling API routes
+
 **React.js**	Frontend framework for building UI
+
 **Node.js**	Runtime environment for backend logic
 
 ### **⚙️ DevOps Tools & Technologies Used**
 #### **Tool	Purpose**
 **Docker**	Containerization of the MERN application
+
 **Jenkins**	Continuous Integration and Continuous Deployment (CI/CD)
+
 **SonarQube**	Static Code Analysis to ensure code quality
+
 **Ansible**	Automated Deployment to servers
+
 **Prometheus**	Metrics collection and performance monitoring
+
 **Grafana**	Visualization and observability dashboards
 
 ### **🧩 Project Workflow**
@@ -71,10 +79,13 @@ Ansible installed and SSH access to the deployment server
    sudo docker compose up -d
  ```
 **4. Access Jenkins**
+
     URL: http://localhost:8080
+    
     Configure Jenkins pipeline using the Jenkinsfile provided in this repository.
 
 **5. Run SonarQube Analysis**
+
     Jenkins automatically triggers SonarQube analysis during the pipeline build stage.
 
 **6. Deploy with Ansible**
@@ -83,7 +94,9 @@ ansible-playbook -i inventory.ini master.yml
 ```
 
 **7. Monitor Metrics**
+
     **Prometheus**: http://localhost:9090
+    
     **Grafana**: http://localhost:3000
    
 

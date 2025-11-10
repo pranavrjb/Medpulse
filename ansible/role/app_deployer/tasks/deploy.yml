@@ -1,0 +1,12 @@
+---
+- name: Create application folder
+  ansible.builtin.file:
+    path: "{{app_path}}"
+    state: directory
+    mode: '0755'
+
+- name: copy docker compose file to target VM
+  ansible.builtin.copy:
+    src: "{{local_compose_path}}"
+    dest: "{{app_path}}/docker-compose.yml"
+    mode: '0644'

@@ -1,0 +1,22 @@
+---
+
+- name: Log in to Harbor Registry
+  ansible.builtin.shell: |
+    echo "{{ harbor_pass }}" | docker login {{ harbor_url }} -u "{{ harbor_user }}" --password-stdin
+  args:
+    executable: /bin/bash
+
+- name: Pull frontend image
+  community.docker.docker_image:
+    name: "{{ harbor_url }}/{{ project_name }}/{{ frontend_image }}:latest"
+    source: pull
+
+- name: Pull backend image
+  community.docker.docker_image:
+    name: "{{ harbor_url }}/{{ project_name }}/{{ backend_image }}:latest"
+    source: pull
+
+- name: Pull mongo image
+  community.docker.docker_image:
+    name: "{{ harbor_url }}/{{ project_name }}/{{ mongo_image }}:4.4"
+    source: pull

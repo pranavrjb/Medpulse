@@ -59,27 +59,31 @@ Prometheus & Grafana configured for monitoring
 
 Ansible installed and SSH access to the deployment server
 
-### **🚀 How to Run the Project**
+## 🚀 **How to Run the Project**
 
-**1. Clone this repository**
+1. **Clone this repository**
+   ```bash
    git clone https://github.com/pranavrjb/Medpulse.git
    cd Medpulse
 
 **2. Start the Docker Containers**
+ ```bash
    sudo docker compose up -d
-   
+ ```
 **4. Access Jenkins**
-  URL: http://localhost:8080
-  Configure Jenkins pipeline using the Jenkinsfile provided in this repository.
+URL: http://localhost:8080
+Configure Jenkins pipeline using the Jenkinsfile provided in this repository.
 
 **5. Run SonarQube Analysis**
-  Jenkins automatically triggers SonarQube analysis during the pipeline build stage.
+Jenkins automatically triggers SonarQube analysis during the pipeline build stage.
 
 **6. Deploy with Ansible**
-   ansible-playbook -i inventory.ini master.yml
+```bash 
+ansible-playbook -i inventory.ini master.yml
+```
 
 **7. Monitor Metrics**
-   **Prometheus**: http://localhost:9090
-   **Grafana**: http://localhost:3000
+**Prometheus**: http://localhost:9090
+**Grafana**: http://localhost:3000
    
 

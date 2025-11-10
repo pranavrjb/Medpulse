@@ -52,6 +52,7 @@ Prometheus collects real-time metrics from the running containers.
 
 Grafana visualizes metrics and provides dashboards for performance monitoring and alerting.
 
+![cicdee](https://github.com/user-attachments/assets/9525fae9-e404-475a-9591-39a6cbb1c3d4)
 
 ### **🛠️ Prerequisites**
 

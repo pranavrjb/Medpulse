@@ -41,53 +41,62 @@ pipeline {
 }
 
 
-        stage('Build Frontend Image') {
-            steps {
-                echo 'Building Frontend Docker image...'
-                sh "docker build -t ${FRONTEND_IMAGE}:${IMAGE_TAG} ./frontend"
-            }
+    stage('Build Frontend Image') {
+    steps {
+        echo 'Building Frontend Docker image...'
+        sh "docker build -t ${FRONTEND_IMAGE}:${IMAGE_TAG} ./frontend"
+        }
+    }
+
+    stage('Build Backend Image') {
+        steps {
+            echo 'Building Backend Docker image...'
+            sh "docker build -t ${BACKEND_IMAGE}:${IMAGE_TAG} ./backend"
         }
 
-        stage('Build Backend Image') {
-            steps {
-                echo 'Building Backend Docker image...'
-                sh "docker build -t ${BACKEND_IMAGE}:${IMAGE_TAG} ./backend"
-            }
-        }
+     stage('Push to Harbor') {
+        steps {
+            echo 'Pushing Docker images to Harbor...'
+            withCredentials([usernamePassword(
+            credentialsId: 'HarborRegistryCred',
+            usernameVariable: 'HARBOR_USER',
+            passwordVariable: 'HARBOR_PASS'
+             )]) {
+                sh '''
+                echo "$HARBOR_PASS" | docker login ${HARBOR_URL} -u "$HARBOR_USER" --password-stdin
+                docker tag ${FRONTEND_IMAGE}:${IMAGE_TAG} ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
+                docker push ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
 
-        stage('Push to Harbor') {
-            steps {
-                echo 'Pushing Docker images to Harbor...'
-                withCredentials([usernamePassword(
-                    credentialsId: 'HarborRegistryCred',
-                    usernameVariable: 'HARBOR_USER',
-                    passwordVariable: 'HARBOR_PASS'
-                )]) {
-                    sh '''
-                    echo "$HARBOR_PASS" | docker login ${HARBOR_URL} -u "$HARBOR_USER" --password-stdin
+                docker tag ${BACKEND_IMAGE}:${IMAGE_TAG} ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
+                docker push ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
 
-                    docker tag ${FRONTEND_IMAGE}:${IMAGE_TAG} ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
-                    docker push ${HARBOR_URL}/${PROJECT_NAME}/${FRONTEND_IMAGE}:${IMAGE_TAG}
+                docker tag ${MONGO_IMAGE} ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
+                docker push ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
 
-                    docker tag ${BACKEND_IMAGE}:${IMAGE_TAG} ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
-                    docker push ${HARBOR_URL}/${PROJECT_NAME}/${BACKEND_IMAGE}:${IMAGE_TAG}
-
-                    docker tag ${MONGO_IMAGE} ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
-                    docker push ${HARBOR_URL}/${PROJECT_NAME}/mongo:4.4
-
-                    docker logout ${HARBOR_URL}
+                docker logout ${HARBOR_URL}
                     '''
                 }
             }
         }
-stage('Debug Environment') {
-    agent any
+    stage('Debug Environment') {
+        agent any
+        steps {
+            sh '''
+            echo "Running on node: $(hostname)"
+            echo "Current user: $(whoami)"
+            echo "Current directory: $(pwd)"
+            echo "Checking for Ansible venv path..."
+            '''
+        }
+    }
+}
+stage('Run Ansible Playbook') {
+    agent {label 'master'}
     steps {
         sh '''
-        echo "Running on node: $(hostname)"
-        echo "Current user: $(whoami)"
-        echo "Current directory: $(pwd)"
-        echo "Checking for Ansible venv path..."
+        echo "Activating Ansible virtual environment..."
+        cd /opt/ansible_env
+        ansible-playbook -i inventory.ini master.yaml
         '''
     }
 }

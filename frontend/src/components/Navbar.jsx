@@ -184,7 +184,7 @@ const Navbar = () => {
               gap: 2,
             }}
           >
-            <Button
+            {/* <Button
               component={Link}
               to="/about"
               sx={{
@@ -197,7 +197,7 @@ const Navbar = () => {
               }}
             >
               About Us
-            </Button>
+            </Button>*/}
             <Button
               component={Link}
               to="/contact"
@@ -231,7 +231,7 @@ const Navbar = () => {
                     >
                       Admin
                     </Button>
-                    <Button
+                    {/* <Button
                       component={Link}
                       to="/manageusers"
                       sx={{
@@ -260,7 +260,7 @@ const Navbar = () => {
                       }}
                     >
                       Add Company
-                    </Button>
+                    </Button> */}
                     <Button
                       component={Link}
                       to="/managebookings"
